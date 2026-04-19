@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import Boolean, DateTime, Index, Text, func, text
+from sqlalchemy import Boolean, DateTime, ForeignKey, Index, Text, func, text
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -22,6 +22,7 @@ class ApiEndpoint(Base):
     )
     api_id: Mapped[str] = mapped_column(
         UUID(as_uuid=False),
+        ForeignKey("apis.id", ondelete="CASCADE"),
         nullable=False,
     )
     method: Mapped[str] = mapped_column(Text, nullable=False)

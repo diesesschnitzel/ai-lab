@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, Index, Integer, Text, func, text
+from sqlalchemy import Boolean, DateTime, ForeignKey, Index, Integer, Text, func, text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -21,6 +21,7 @@ class ApiHealthLog(Base):
     )
     api_id: Mapped[str] = mapped_column(
         UUID(as_uuid=False),
+        ForeignKey("apis.id", ondelete="CASCADE"),
         nullable=False,
     )
     checked_at: Mapped[datetime] = mapped_column(
