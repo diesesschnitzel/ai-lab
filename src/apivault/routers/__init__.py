@@ -1,9 +1,3 @@
-from fastapi import APIRouter
+from src.apivault.routers.apis import router
 
-router = APIRouter()
-
-
-@router.get("/health")
-async def health_check() -> dict:
-    """Health check endpoint."""
-    return {"status": "ok"}
+__all__ = ["router"]
