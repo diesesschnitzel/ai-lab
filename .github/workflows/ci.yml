@@ -101,7 +101,7 @@ jobs:
       - name: Run database migrations
         env:
           DATABASE_URL: postgresql+asyncpg://apivault:test_password@localhost:5432/apivault_test
-        run: uv run python -m src.apivault.db.migrate
+        run: uv run alembic upgrade head
 
       - name: Run tests
         env:

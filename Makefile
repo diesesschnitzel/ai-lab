@@ -70,7 +70,7 @@ docker-logs:
 
 # Database
 migrate:
-	docker compose run --rm worker python -m src.apivault.db.migrate
+	docker compose run --rm worker alembic upgrade head
 
 backup:
 	@mkdir -p backups
