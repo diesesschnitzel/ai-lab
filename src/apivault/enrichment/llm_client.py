@@ -9,7 +9,7 @@ from typing import Any
 import httpx
 
 from src.apivault.config import settings
-from src.apivault.enrichment.models import EnrichmentContext, EnrichmentResult
+from src.apivault.enrichment.models import EnrichmentContext
 
 logger = logging.getLogger(__name__)
 
@@ -117,7 +117,9 @@ TAG_VOCABULARY = [
     "climate",
 ]
 
-CLASSIFICATION_PROMPT = """You are building a developer API reference database. Your task is to classify and describe a single API based on the information provided.
+CLASSIFICATION_PROMPT = """\
+You are building a developer API reference database.
+Your task is to classify and describe a single API based on the information provided.
 
 ---
 API Name: {name}
@@ -131,12 +133,18 @@ Available top-level categories (choose from these only):
 {category_list}
 
 Instructions:
-1. categories: Pick 1-5 categories. Format: "TopLevel > SubCategory". Put the most specific/primary category first.
+1. categories: Pick 1-5 categories. Format: "TopLevel > SubCategory".
+   Put the most specific/primary category first.
 2. tags: Pick 5-15 tags. Use the preferred vocabulary where possible.
    Preferred vocabulary: {tag_vocabulary}
    You may add domain-specific tags not in the vocabulary.
-3. use_cases: Write 3-6 use cases. Each must start with "Use to". Be specific and practical.
-4. description_llm: Write a 2-3 sentence plain-language summary. First sentence: what it does. Second: who uses it or key differentiator. Third (optional): notable limits or free tier detail. Do NOT just repeat the source description. Improve it.
+3. use_cases: Write 3-6 use cases. Each must start with "Use to".
+   Be specific and practical.
+4. description_llm: Write a 2-3 sentence plain-language summary.
+   First sentence: what it does.
+   Second: who uses it or key differentiator.
+   Third (optional): notable limits or free tier detail.
+   Do NOT just repeat the source description. Improve it.
 5. company: The company or organization that provides this API (if known).
 
 Respond ONLY with valid JSON, no markdown:

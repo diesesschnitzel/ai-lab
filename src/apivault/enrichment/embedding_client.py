@@ -125,7 +125,7 @@ class OpenAIEmbeddingClient:
             )
             response.raise_for_status()
             data = response.json()
-            embeddings_map = {i: entry["embedding"] for entry, (i, _) in zip(data["data"], non_empty)}
+            embeddings_map = {i: entry["embedding"] for entry, (i, _) in zip(data["data"], non_empty, strict=False)}
             return [embeddings_map.get(i) for i in range(len(texts))]
         except Exception:
             logger.exception("OpenAI batch embedding failed")
