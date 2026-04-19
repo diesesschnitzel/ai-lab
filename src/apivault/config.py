@@ -24,6 +24,27 @@ class Settings(BaseSettings):
     admin_key: str = ""
     cors_origins: str = "*"
 
+    # App
+    app_name: str = "APIVault"
+    debug: bool = False
+
+    # LLM Enrichment
+    llm_provider: str = "ollama"
+    ollama_base_url: str = "http://localhost:11434"
+    ollama_llm_model: str = "llama3.2"
+    openai_api_key: str = ""
+    openai_llm_model: str = "gpt-4o-mini"
+
+    # Embeddings
+    embedding_provider: str = "ollama"
+    ollama_embedding_model: str = "nomic-embed-text"
+    openai_embedding_model: str = "text-embedding-3-small"
+
+    # Enrichment worker
+    enrichment_batch_size: int = 20
+    enrichment_poll_interval: int = 30
+    enrichment_max_retries: int = 3
+
     # Validation
     validation_concurrency: int = 50
     validation_timeout_connect_seconds: float = 5.0
