@@ -8,6 +8,7 @@ from typing import Any
 from pgvector.sqlalchemy import Vector
 from sqlalchemy import (
     Boolean,
+    CheckConstraint,
     Date,
     DateTime,
     Index,
@@ -30,7 +31,7 @@ class Api(Base, TimestampMixin):
         server_default=text("uuid_generate_v4()"),
         primary_key=True,
     )
-    slug: Mapped[str | None] = mapped_column(Text, unique=True)
+    slug: Mapped[str | None] = mapped_column(Text)
     name: Mapped[str] = mapped_column(Text, nullable=False)
 
     description: Mapped[str | None] = mapped_column(Text)
@@ -100,14 +101,23 @@ class Api(Base, TimestampMixin):
 
     raw_json: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
 
-    endpoints: Mapped[list["ApiEndpoint"]] = relationship(  # type: ignore[name-defined]
+    endpoints: Mapped[list["ApiEndpoint"]] = relationship(  # noqa: UP037, F821
         "ApiEndpoint", back_populates="api", cascade="all, delete-orphan"
     )
-    health_logs: Mapped[list["ApiHealthLog"]] = relationship(  # type: ignore[name-defined]
+    health_logs: Mapped[list["ApiHealthLog"]] = relationship(  # noqa: UP037, F821
         "ApiHealthLog", back_populates="api", cascade="all, delete-orphan"
     )
 
     __table_args__ = (
+        CheckConstraint("health_score BETWEEN 0 AND 100", name="chk_health_score_range"),
+        CheckConstraint(
+            "status IN ('unknown','pending_validation','active','degraded','dead')",
+            name="chk_api_status",
+        ),
+        CheckConstraint(
+            "auth_type IN ('none','apikey','oauth2','basic','bearer','unknown')",
+            name="chk_auth_type",
+        ),
         Index("idx_apis_slug", "slug", unique=True, postgresql_where=text("slug IS NOT NULL")),
         Index("idx_apis_base_url", "base_url", postgresql_where=text("base_url IS NOT NULL")),
         Index("idx_apis_status", "status"),

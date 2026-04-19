@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, Index, Integer, Text, func, text
+from sqlalchemy import Boolean, DateTime, ForeignKeyConstraint, Index, Integer, Text, func, text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -38,11 +38,12 @@ class ApiHealthLog(Base):
     error: Mapped[str | None] = mapped_column(Text)
     checker_version: Mapped[str | None] = mapped_column(Text)
 
-    api: Mapped["Api"] = relationship(  # type: ignore[name-defined]
+    api: Mapped["Api"] = relationship(  # noqa: UP037, F821
         "Api", back_populates="health_logs"
     )
 
     __table_args__ = (
+        ForeignKeyConstraint(["api_id"], ["apis.id"], ondelete="CASCADE"),
         Index("idx_health_log_api_id", "api_id", "checked_at", postgresql_ops={"checked_at": "DESC"}),
         Index("idx_health_log_checked", "checked_at", postgresql_ops={"checked_at": "DESC"}),
         Index(

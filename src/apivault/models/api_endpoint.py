@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import Boolean, DateTime, Index, Text, func, text
+from sqlalchemy import Boolean, DateTime, ForeignKeyConstraint, Index, Text, func, text
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -42,11 +42,12 @@ class ApiEndpoint(Base):
         nullable=False,
     )
 
-    api: Mapped["Api"] = relationship(  # type: ignore[name-defined]
+    api: Mapped["Api"] = relationship(  # noqa: UP037, F821
         "Api", back_populates="endpoints"
     )
 
     __table_args__ = (
+        ForeignKeyConstraint(["api_id"], ["apis.id"], ondelete="CASCADE"),
         Index("idx_endpoints_api_id", "api_id"),
         Index("idx_endpoints_method", "method"),
         Index(
