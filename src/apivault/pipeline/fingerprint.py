@@ -8,8 +8,8 @@ from __future__ import annotations
 
 import hashlib
 import re
+from typing import Any
 from urllib.parse import parse_qs, urlencode, urlsplit, urlunsplit
-
 
 # Common URL parameters that don't affect identity
 IGNORED_QUERY_PARAMS = frozenset(
@@ -138,7 +138,7 @@ def extract_base_url(url: str) -> str:
     return f"{parsed.scheme.lower()}://{netloc}"
 
 
-def extract_docs_url(url: str, raw_data: dict | None = None) -> str | None:
+def extract_docs_url(url: str, raw_data: dict[str, Any] | None = None) -> str | None:
     """Attempt to extract a documentation URL from the candidate URL or raw data.
 
     Checks for common documentation path patterns in the URL and raw data fields.
@@ -146,7 +146,7 @@ def extract_docs_url(url: str, raw_data: dict | None = None) -> str | None:
     if raw_data:
         for key in ("docs_url", "documentation_url", "doc_url", "api_docs_url"):
             if raw_data.get(key):
-                return raw_data[key]
+                return str(raw_data[key])
 
     parsed = urlsplit(url)
     path = parsed.path.lower()
@@ -176,11 +176,9 @@ def detect_api_path(url: str) -> str:
 
     # Return the path up to common non-API segments
     segments = [s for s in path.split("/") if s]
-    api_segments = []
+    api_segments: list[str] = []
     for segment in segments:
-        if segment.startswith(("v", "api", "rest", "graphql", "grpc")):
-            api_segments.append(segment)
-        elif api_segments:
+        if segment.startswith(("v", "api", "rest", "graphql", "grpc")) or api_segments:
             api_segments.append(segment)
         else:
             break

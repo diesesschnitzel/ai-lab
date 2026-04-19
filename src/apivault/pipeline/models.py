@@ -2,14 +2,14 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
-from enum import Enum
+from datetime import UTC, datetime
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field
 
 
-class ApiFormat(str, Enum):
+class ApiFormat(StrEnum):
     """Detected API format types."""
 
     REST = "rest"
@@ -21,7 +21,7 @@ class ApiFormat(str, Enum):
     UNKNOWN = "unknown"
 
 
-class ConfidenceLevel(str, Enum):
+class ConfidenceLevel(StrEnum):
     """Confidence level for data sources."""
 
     HIGH = "high"
@@ -33,7 +33,7 @@ class DataSource(BaseModel):
     """Represents where an API candidate was discovered."""
 
     source: str
-    discovered_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    discovered_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     confidence: ConfidenceLevel = ConfidenceLevel.LOW
     raw_data: dict[str, Any] = Field(default_factory=dict)
 
@@ -61,8 +61,8 @@ class NormalizedApi(BaseModel):
     sources: list[DataSource] = Field(default_factory=list)
     confidence: ConfidenceLevel = ConfidenceLevel.LOW
     url_fingerprint: str | None = None
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     metadata: dict[str, Any] = Field(default_factory=dict)
 
     def merge_with(self, other: NormalizedApi) -> NormalizedApi:
@@ -76,10 +76,7 @@ class NormalizedApi(BaseModel):
         self_confidence_idx = other_confidence_order.index(self.confidence)
         other_confidence_idx = other_confidence_order.index(other.confidence)
 
-        if other_confidence_idx > self_confidence_idx:
-            new_confidence = other.confidence
-        else:
-            new_confidence = self.confidence
+        new_confidence = other.confidence if other_confidence_idx > self_confidence_idx else self.confidence
 
         return NormalizedApi(
             id=self.id,
@@ -93,7 +90,7 @@ class NormalizedApi(BaseModel):
             confidence=new_confidence,
             url_fingerprint=self.url_fingerprint,
             created_at=self.created_at,
-            updated_at=datetime.now(timezone.utc),
+            updated_at=datetime.now(UTC),
             metadata={**self.metadata, **other.metadata},
         )
 
