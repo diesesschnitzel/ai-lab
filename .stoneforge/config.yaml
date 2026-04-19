@@ -1,0 +1,31 @@
+# Stoneforge Configuration
+
+name: ai-team
+database: stoneforge.db
+sync:
+  auto_export: true
+  elements_file: elements.jsonl
+  dependencies_file: dependencies.jsonl
+playbooks:
+  paths:
+    - playbooks
+identity:
+  mode: soft
+merge:
+  auto_merge: true
+  target_branch: null
+  require_approval: false
+workflow:
+  preset: auto
+agents:
+  permission_model: unrestricted
+  defaults:
+    provider: opencode
+    model: alibaba-coding-plan/qwen3.6-plus
+external_sync:
+  auto_link: true
+  auto_link_provider: github
+  enabled: true
+  poll_interval: 60000
+  conflict_strategy: last_write_wins
+  default_direction: bidirectional
