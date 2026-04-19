@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # APIVault — The World's Most Complete Free API Database
 
 APIVault is a self-hosted, continuously updated, semantically searchable database
@@ -131,3 +132,6 @@ apivault/
 ├── Makefile
 └── .env.example
 ```
+=======
+# APIVault
+>>>>>>> main

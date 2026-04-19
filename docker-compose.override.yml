@@ -1,0 +1,37 @@
+# Development overrides for docker-compose
+# These settings are merged with docker-compose.yml for local development
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: docker/api/Dockerfile
+    volumes:
+      - ./src:/app/src:ro
+    environment:
+      LOG_LEVEL: DEBUG
+      LOG_FORMAT: text
+      CORS_ORIGINS: "*"
+    ports:
+      - "0.0.0.0:8000:8000"
+
+  worker:
+    build:
+      context: .
+      dockerfile: docker/worker/Dockerfile
+    volumes:
+      - ./src:/app/src:ro
+    environment:
+      LOG_LEVEL: DEBUG
+      LOG_FORMAT: text
+
+  scheduler:
+    build:
+      context: .
+      dockerfile: docker/scheduler/Dockerfile
+    volumes:
+      - ./src:/app/src:ro
+    environment:
+      LOG_LEVEL: DEBUG
+      LOG_FORMAT: text
+      BOOTSTRAP_ON_EMPTY_DB: "true"
