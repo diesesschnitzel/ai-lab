@@ -1,0 +1,66 @@
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: apivault-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-apivault}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-apivault}
+      POSTGRES_DB: ${POSTGRES_DB:-apivault}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-apivault} -d ${POSTGRES_DB:-apivault}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: .
+    container_name: apivault-api
+    command: uvicorn src.apivault.main:app --host 0.0.0.0 --port 8000 --reload
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-apivault}:${POSTGRES_PASSWORD:-apivault}@db:5432/${POSTGRES_DB:-apivault}
+      API_HOST: 0.0.0.0
+      API_PORT: 8000
+    ports:
+      - "${API_PORT:-8000}:8000"
+    volumes:
+      - ./src:/app/src
+    depends_on:
+      db:
+        condition: service_healthy
+
+  scheduler:
+    build: .
+    container_name: apivault-scheduler
+    command: python -m src.apivault.scheduler
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-apivault}:${POSTGRES_PASSWORD:-apivault}@db:5432/${POSTGRES_DB:-apivault}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  worker:
+    build: .
+    container_name: apivault-worker
+    command: python -m src.apivault.worker
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-apivault}:${POSTGRES_PASSWORD:-apivault}@db:5432/${POSTGRES_DB:-apivault}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  enrichment:
+    build: .
+    container_name: apivault-enrichment
+    command: python -m src.apivault.enrichment
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-apivault}:${POSTGRES_PASSWORD:-apivault}@db:5432/${POSTGRES_DB:-apivault}
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
