@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.apivault.config import settings
-from src.apivault.routers import apis, enrichment
+from src.apivault.routers import apis, browse, detail, enrichment
 
 START_TIME = time.time()
 
@@ -37,7 +37,9 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    app.include_router(apis.router, tags=["apis"])
+    app.include_router(browse.router, tags=["apis"])
+    app.include_router(detail.router, tags=["apis"])
+    app.include_router(apis.router)
     app.include_router(enrichment.router)
 
     return app
